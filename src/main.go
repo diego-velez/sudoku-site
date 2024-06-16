@@ -35,8 +35,11 @@ func main() {
 	http.HandleFunc("/boards", getBoard)
 
 	var port = os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
 
-	err := http.ListenAndServe("0.0.0.0:"+port, nil)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
