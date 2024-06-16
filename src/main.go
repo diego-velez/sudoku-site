@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 )
@@ -38,6 +39,8 @@ func main() {
 	if port == "" {
 		port = "3000"
 	}
+
+	fmt.Println("testing console print")
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {

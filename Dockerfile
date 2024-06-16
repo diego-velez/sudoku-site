@@ -6,6 +6,8 @@ COPY . .
 
 RUN go build -o main ./src
 
-EXPOSE 80
+ARG PORT
+EXPOSE $PORT
+EXPOSE 3000
 
 CMD ["./main"]
