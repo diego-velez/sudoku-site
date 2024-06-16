@@ -2,8 +2,7 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY src/ ./src
-COPY assets/ ./assets
+COPY . .
 
 RUN go build -o main ./src
 
