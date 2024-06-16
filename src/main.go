@@ -40,7 +40,7 @@ func main() {
 		port = "3000"
 	}
 
-	fmt.Println("testing console print")
+	fmt.Println("listening on " + port)
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
