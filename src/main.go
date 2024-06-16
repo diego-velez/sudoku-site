@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 )
 
 type Boards struct {
@@ -33,7 +34,9 @@ func main() {
 
 	http.HandleFunc("/boards", getBoard)
 
-	err := http.ListenAndServe("", nil)
+	var port = os.Getenv("PORT")
+
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
