@@ -1,10 +1,11 @@
 FROM golang:latest
 
-WORKDIR /src
+WORKDIR /app
 
-COPY . .
+COPY src/ ./src
+COPY assets/ ./assets
 
-RUN go build -o main .
+RUN go build -o main ./src
 
 EXPOSE 80
 
