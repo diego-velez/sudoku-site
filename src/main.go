@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 )
@@ -17,11 +16,23 @@ func handling(writer http.ResponseWriter, request *http.Request) {
 }
 
 func getBoard(writer http.ResponseWriter, request *http.Request) {
+	var difficulty = request.PathValue("difficulty")
+	var amountToRemove int
+
+	switch difficulty {
+	case "easy":
+		amountToRemove = 10
+	case "medium":
+		amountToRemove = 20
+	case "hard":
+		amountToRemove = 30
+	}
+
 	var board = *generateBoard(nil, getSequence(), 0, 0)
 
 	var boards = Boards{
 		CompleteBoard: board,
-		PlayableBoard: removeNumbers(board, 5),
+		PlayableBoard: removeNumbers(board, amountToRemove),
 	}
 
 	json.NewEncoder(writer).Encode(boards)
@@ -33,14 +44,12 @@ func main() {
 
 	http.HandleFunc("/", handling)
 
-	http.HandleFunc("/boards", getBoard)
+	http.HandleFunc("/boards/{difficulty}", getBoard)
 
 	var port = os.Getenv("PORT")
 	if port == "" {
 		port = "3000"
 	}
-
-	fmt.Println("listening on " + port)
 
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
