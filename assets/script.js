@@ -29,8 +29,8 @@ function drawBoard(boards) {
             const cell = document.createElement('div');
             cell.classList.add('sudoku-cell');
             cell.contentEditable = true;
-            if (boards.playable_board[i][j] !== 0) {
-                cell.textContent = boards.playable_board[i][j];
+            if (boards.unsolved_board[i][j] !== 0) {
+                cell.textContent = boards.unsolved_board[i][j];
                 cell.classList.add('initial');
                 cell.contentEditable = false;
             }
@@ -59,7 +59,7 @@ function drawBoard(boards) {
                     row.push(cellNum);
                 }
 
-                if (arraysEqual(board, boards.complete_board)) {
+                if (arraysEqual(board, boards.solved_board)) {
                     alert("muy bien jodio bastardo");
                 }
             };
