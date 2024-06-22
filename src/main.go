@@ -7,15 +7,15 @@ import (
 )
 
 type Boards struct {
-	CompleteBoard [9][9]int `json:"complete_board"`
-	PlayableBoard [9][9]int `json:"playable_board"`
+	CompleteBoard *Board `json:"complete_board"`
+	PlayableBoard *Board `json:"playable_board"`
 }
 
-func handling(writer http.ResponseWriter, request *http.Request) {
+func HandleIndex(writer http.ResponseWriter, request *http.Request) {
 	http.ServeFile(writer, request, "assets/index.html")
 }
 
-func getBoard(writer http.ResponseWriter, request *http.Request) {
+func HandleBoards(writer http.ResponseWriter, request *http.Request) {
 	var difficulty = request.PathValue("difficulty")
 	var amountToRemove int
 
@@ -28,11 +28,11 @@ func getBoard(writer http.ResponseWriter, request *http.Request) {
 		amountToRemove = 30
 	}
 
-	var board = *generateBoard(nil, getSequence(), 0, 0)
+	var board = NewBoard()
 
 	var boards = Boards{
 		CompleteBoard: board,
-		PlayableBoard: removeNumbers(board, amountToRemove),
+		PlayableBoard: NewBoardRemoveNumbers(*board, amountToRemove),
 	}
 
 	json.NewEncoder(writer).Encode(boards)
@@ -42,9 +42,9 @@ func main() {
 	var fs = http.FileServer(http.Dir("assets/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.HandleFunc("/", handling)
+	http.HandleFunc("/", HandleIndex)
 
-	http.HandleFunc("/boards/{difficulty}", getBoard)
+	http.HandleFunc("/boards/{difficulty}", HandleBoards)
 
 	var port = os.Getenv("PORT")
 	if port == "" {
