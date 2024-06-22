@@ -4,17 +4,20 @@ import (
 	"math/rand"
 )
 
+// Board is a 2-dimensional array that represents a 9x9 Sudoku board.
+//
+// Each inner array represents a row.
 type Board = [9][9]int
 
 const EMPTY = 0
 
-// NewBoard Generates a 9x9 Sudoku board.
+// NewBoard generates a random [Board].
 func NewBoard() *Board {
 	return generateBoard(nil, randomIntArray(), 0, 0)
 }
 
-// generateBoard Fills a 9x9 Sudoku board, starting at the specified row and column index.
-// Accepts nil board to create an empty board.
+// generateBoard fills a [Board], starting at the specified row and column index.
+// Accepts a nil board, which creates an empty [Board].
 func generateBoard(board *Board, sequence [9]int, row int, column int) *Board {
 	// Create an empty board
 	if board == nil {
@@ -49,7 +52,8 @@ func generateBoard(board *Board, sequence [9]int, row int, column int) *Board {
 	return board
 }
 
-// canPlay Checks if a number you want to play can be played in that position following the Sudoku rules.
+// canPlay reports whether a number can be played (according to the Sudoku rules) in a specific
+// row and column position.
 func canPlay(board *Board, number int, row int, column int) bool {
 	// Checks if the number was played in the same row or column
 	for index := range 9 {
@@ -84,7 +88,8 @@ func canPlay(board *Board, number int, row int, column int) bool {
 	return true
 }
 
-// NewBoardRemoveNumbers Remove n numbers from the board at random positions.
+// NewBoardRemoveNumbers returns a new [Board] copy of the board passed with n numbers removed
+// from the board at random positions.
 func NewBoardRemoveNumbers(board Board, n int) *Board {
 	for i := 0; i < n; i++ {
 		var x, y int
@@ -98,7 +103,7 @@ func NewBoardRemoveNumbers(board Board, n int) *Board {
 	return &board
 }
 
-// randomIntArray Generates an array of 9 random integers from 1 to 9 (inclusive), and sorts it
+// randomIntArray generates an array of 9 random integers from 1 to 9 (inclusive), and sorts it
 // randomly.
 func randomIntArray() [9]int {
 	var trySequence [9]int

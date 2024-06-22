@@ -6,9 +6,11 @@ import (
 	"os"
 )
 
+// Boards represent a JSON response with 2 variations of the same Sudoku board, one that is
+// completely filled, and one that has empty cells.
 type Boards struct {
-	CompleteBoard *Board `json:"complete_board"`
-	PlayableBoard *Board `json:"playable_board"`
+	SolvedBoard   *Board `json:"complete_board"`
+	UnsolvedBoard *Board `json:"playable_board"`
 }
 
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {
@@ -31,8 +33,8 @@ func HandleBoards(writer http.ResponseWriter, request *http.Request) {
 	var board = NewBoard()
 
 	var boards = Boards{
-		CompleteBoard: board,
-		PlayableBoard: NewBoardRemoveNumbers(*board, amountToRemove),
+		SolvedBoard:   board,
+		UnsolvedBoard: NewBoardRemoveNumbers(*board, amountToRemove),
 	}
 
 	json.NewEncoder(writer).Encode(boards)
