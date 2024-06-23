@@ -45,7 +45,7 @@ func generateBoard(board *Board, sequence *Row, row int, column int) *Board {
 
 	for _, num := range sequence {
 		// Check if number can be played
-		if !canPlay(board, num, row, column) {
+		if !isValidCell(board, num, row, column) {
 			continue
 		}
 
@@ -71,9 +71,9 @@ func generateBoard(board *Board, sequence *Row, row int, column int) *Board {
 	return board
 }
 
-// canPlay reports whether a number can be played (according to the Sudoku rules) in a specific
+// isValidCell reports whether a number can be played (according to the Sudoku rules) in a specific
 // row and column position.
-func canPlay(board *Board, number Cell, row int, column int) bool {
+func isValidCell(board *Board, number Cell, row int, column int) bool {
 	// Checks if the number was played in the same row or column
 	for index := range 9 {
 		if board[row][index] == number || board[index][column] == number {
