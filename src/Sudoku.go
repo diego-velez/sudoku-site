@@ -74,6 +74,11 @@ func generateBoard(board *Board, sequence *Row, row int, column int) *Board {
 // isValidCell reports whether a number can be played (according to the Sudoku rules) in a specific
 // row and column position.
 func isValidCell(board *Board, number Cell, row int, column int) bool {
+	// Disallow inserting in an already occupied cell
+	if board[row][column] != EMPTY {
+		return false
+	}
+
 	// Checks if the number was played in the same row or column
 	for index := range 9 {
 		if board[row][index] == number || board[index][column] == number {
