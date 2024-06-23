@@ -136,13 +136,14 @@ func NewBoardForDifficulty(diff difficulty) *Board {
 // shuffledRow generates a valid Sudoku [Row] with a random/shuffled order.
 func shuffledRow() *Row {
 	var row = new(Row)
-	for i := 0; i < 9; i++ {
-		row[i] = Cell(i + 1)
-	}
 
-	rand.Shuffle(9, func(i, j int) {
-		row[i], row[j] = row[j], row[i]
-	})
+	// Utilizes the Fisher-Yates shuffle algorithm to create a valid shuffled Sudoku row
+	// This code is taken from the rand.Perm function
+	for i := 0; i < 9; i++ {
+		j := rand.Intn(i + 1)
+		row[i] = row[j]
+		row[j] = Cell(i + 1)
+	}
 
 	return row
 }
