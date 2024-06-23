@@ -1,84 +1,98 @@
-document.addEventListener('DOMContentLoaded', function() {
-    getNewBoards("easy")
-});
+const EMPTY = 0;
 
-function getNewBoards(difficulty) {
-    fetch(`boards/${difficulty}`)
-        .then((response) => {
-            if (response.ok !== true) {
-                throw Error("Could not get board :(");
-            }
+// Handles div input for each editable div within the Sudoku board
+function inputHandler(div) {
+    const boardElement = document.getElementById('sudoku-board');
 
-            return response.json();
-        })
-        .then((boards) => {
-            drawBoard(boards);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+    // Limit input to 1 character
+    if (div.textContent.length > 1) {
+        div.textContent = div.textContent.slice(0, 1);
+    }
+
+    // Limit input to numbers only
+    div.textContent = div.textContent.replace(/[^\d]/g, '');
+
+    // Check if the Sudoku board is complete and correct by converting it to its 2-dimensional array representation, and
+    // validating each cell as it is being converted.
+    const board = []
+    for (let i = 0; i < boardElement.childElementCount; i++) {
+        const childElement = boardElement.children[i];
+        const rowIndex = Math.floor(i / 9);
+
+        // The number in the cell, will be converted to the EMPTY representation if needed
+        const num = childElement.textContent === "" ? EMPTY : parseInt(childElement.textContent);
+
+        // Checks if there is still an empty cell in the board
+        if (num === EMPTY) {
+            console.log("Board is not complete")
+            return;
+        }
+
+        // Checks if the row exists in the array representation, add it if not
+        let row = board[rowIndex];
+        if (row === undefined) {
+            row = [num];
+            board.push(row);
+
+            // TODO: Maybe we could check if cell is valid this iteration
+            continue;
+        }
+
+        // Checks if the cell is valid with the construction of the board so far
+        if (!validCell(board, num, rowIndex, row.indexOf(num))) {
+            console.log("Board invalid :(");
+            return;
+        }
+
+        row.push(num);
+    }
+
+    alert("muy bien jodio bastardo");
 }
 
-// Draws the Sudoku board
-function drawBoard(boards) {
-    const boardElement = document.getElementById('sudoku-board');
-    boardElement.innerHTML = "";
-
-    for (let i = 0; i < 9; i++) {
-        for (let j = 0; j < 9; j++) {
-            const cell = document.createElement('div');
-            cell.classList.add('sudoku-cell');
-            cell.contentEditable = true;
-            if (boards.unsolved_board[i][j] !== 0) {
-                cell.textContent = boards.unsolved_board[i][j];
-                cell.classList.add('initial');
-                cell.contentEditable = false;
-            }
-
-            cell.oninput = function(event) {
-                if (this.textContent.length > 1) {
-                    this.textContent = this.textContent.slice(0, 1);
-                }
-
-                this.textContent = this.textContent.replace(/[^\d]/g, '');
-
-                // Convert the Sudoku board from HTML to JSON
-                const board = []
-                for (let i = 0; i < boardElement.childElementCount; i++) {
-                    const child = boardElement.children[i];
-                    const cellNum = child.textContent === "" ? 0 : parseInt(child.textContent);
-                    const rowIndex = Math.floor(i / 9);
-
-                    let row = board.at(rowIndex);
-                    if (row === undefined) {
-                        row = [cellNum];
-                        board.push(row);
-                        continue;
-                    }
-
-                    row.push(cellNum);
-                }
-
-                if (arraysEqual(board, boards.solved_board)) {
-                    alert("muy bien jodio bastardo");
-                }
-            };
-
-            boardElement.appendChild(cell);
+// Reports if the cell is valid, works with a board that hasn't been fully constructed yet.
+function validCell(board, num, row, column) {
+    // Check if the number was played in the same row or column
+    for (let i = 0; i < board.length; i++) {
+        if (board[row][i] === num || board[i][column] === num) {
+            return false;
         }
     }
-}
 
-function arraysEqual(arr1, arr2) {
-    // Check if arrays are of different length
-    if (arr1.length !== arr2.length) {
-        return false;
+    // Search for the 3x3 grid that the number is in
+    let rowStart = null, rowEnd = null;
+    let columnStart = null, columnEnd = null;
+
+    for (let start = 0; start < 9; start += 3) {
+        const end = start + 2;
+
+        if (start <= row <= end) {
+            rowStart = start;
+
+            if (board[end] === undefined) {
+                rowEnd = board.length - 1;
+            } else {
+                rowEnd = end;
+            }
+        }
+
+        if (start <= column <= end) {
+            columnStart = start;
+
+            if (board[row][end] === undefined) {
+                columnEnd = board[row].length - 1;
+            } else {
+                columnEnd = end;
+            }
+        }
     }
 
-    // Deep comparison using JSON.stringify
-    for (let i = 0; i < arr1.length; i++) {
-        if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) {
-            return false;
+    // Search the 3x3 grid for the number
+    for (let thisRow = rowStart; thisRow <= rowEnd; thisRow++) {
+        for (let thisColumn = columnStart; thisColumn <= columnEnd; thisColumn++) {
+            if (board[thisRow][thisColumn] === num) {
+                return false;
+            }
         }
     }
 

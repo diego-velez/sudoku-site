@@ -1,0 +1,13 @@
+{{ define "sudoku_board" }}
+    <div class="sudoku-board" id="sudoku-board">
+        {{range .}}
+            {{range .}}
+                {{if eq . 0}}
+                    <div class="sudoku-cell" contenteditable="true" oninput="inputHandler(this)"></div>
+                {{else}}
+                    <div class="sudoku-cell">{{.}}</div>
+                {{end}}
+            {{end}}
+        {{end}}
+    </div>
+{{ end }}

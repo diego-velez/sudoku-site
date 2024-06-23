@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVT Sudoku</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="static/script.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="sudoku-container">
+    <h1>El DV metiendole al Sudoku de a doble y con el matrix brrrr</h1>
+    {{template "sudoku_board" .}}
+
+    <div>
+        <button hx-get="/board/easy" hx-target="#sudoku-board" hx-swap="outerHTML">Easy</button>
+        <button hx-get="/board/medium" hx-target="#sudoku-board" hx-swap="outerHTML">Medium</button>
+        <button hx-get="/board/hard" hx-target="#sudoku-board" hx-swap="outerHTML">Hard</button>
+    </div>
+</div>
+</body>
+</html>

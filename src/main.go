@@ -1,43 +1,58 @@
 package main
 
 import (
-	"encoding/json"
+	"html/template"
 	"net/http"
 	"os"
 )
 
-// Boards represent a JSON response with 2 variations of the same Sudoku board, one that is
-// completely filled, and one that has empty cells.
-type Boards struct {
-	SolvedBoard   *Board `json:"solved_board"`
-	UnsolvedBoard *Board `json:"unsolved_board"`
-}
-
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {
-	http.ServeFile(writer, request, "assets/index.html")
+	if request.Method != http.MethodGet {
+		http.Error(writer, "Method not allowed:"+request.Method, http.StatusMethodNotAllowed)
+		return
+	}
+
+	var unsolvedBoard = NewBoardForDifficulty(MEDIUM)
+
+	templ, err := template.ParseFiles("assets/index.gohtml", "assets/com_sudoku_board.gohtml")
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := templ.ExecuteTemplate(writer, "index.gohtml", unsolvedBoard); err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
-func HandleBoards(writer http.ResponseWriter, request *http.Request) {
+func HandleBoard(writer http.ResponseWriter, request *http.Request) {
 	var difficulty = request.PathValue("difficulty")
-	var amountToRemove int
 
+	var board *Board
 	switch difficulty {
 	case "easy":
-		amountToRemove = 10
+		board = NewBoardForDifficulty(EASY)
 	case "medium":
-		amountToRemove = 20
+		board = NewBoardForDifficulty(MEDIUM)
 	case "hard":
-		amountToRemove = 30
+		board = NewBoardForDifficulty(HARD)
+	default:
+		http.Error(writer, "Invalid difficulty:"+difficulty, http.StatusBadRequest)
+		return
 	}
 
-	var board = NewBoard()
-
-	var boards = Boards{
-		SolvedBoard:   board,
-		UnsolvedBoard: NewBoardRemoveNumbers(*board, amountToRemove),
+	templ, err := template.ParseFiles("assets/com_sudoku_board.gohtml")
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	json.NewEncoder(writer).Encode(boards)
+	err = templ.ExecuteTemplate(writer, "sudoku_board", board)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func main() {
@@ -46,7 +61,7 @@ func main() {
 
 	http.HandleFunc("/", HandleIndex)
 
-	http.HandleFunc("/boards/{difficulty}", HandleBoards)
+	http.HandleFunc("/board/{difficulty}", HandleBoard)
 
 	var port = os.Getenv("PORT")
 	if port == "" {

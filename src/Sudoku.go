@@ -4,21 +4,40 @@ import (
 	"math/rand"
 )
 
-// Board is a 2-dimensional array that represents a 9x9 Sudoku board.
-//
-// Each inner array represents a row.
-type Board = [9][9]int
+// Cell is an uint8 number that represents a number in a Sudoku cell.
+type Cell uint8
 
-const EMPTY = 0
+// Row is a 9 long array of [Cell](s) that represent a single row in a Sudoku [Board].
+type Row [9]Cell
+
+// Board is a 9 long array of [Row](s) that represent a 9x9 Sudoku board.
+type Board [9]Row
+
+// EMPTY represents an empty sudoku cell.
+const EMPTY Cell = 0
+
+// difficulty represents how difficult a Sudoku board is.
+//
+// They signify the amount of empty cells that a board of a certain difficulty should have.
+type difficulty uint8
+
+// The difficulty settings supported.
+//
+// They start at 10 (easy) and increment by 10.
+const (
+	EASY difficulty = 10 + (iota * 10)
+	MEDIUM
+	HARD
+)
 
 // NewBoard generates a random [Board].
 func NewBoard() *Board {
-	return generateBoard(nil, randomIntArray(), 0, 0)
+	return generateBoard(nil, shuffledRow(), 0, 0)
 }
 
 // generateBoard fills a [Board], starting at the specified row and column index.
 // Accepts a nil board, which creates an empty [Board].
-func generateBoard(board *Board, sequence [9]int, row int, column int) *Board {
+func generateBoard(board *Board, sequence *Row, row int, column int) *Board {
 	// Create an empty board
 	if board == nil {
 		board = new(Board)
@@ -37,7 +56,7 @@ func generateBoard(board *Board, sequence [9]int, row int, column int) *Board {
 		if column < 8 {
 			generateBoard(board, sequence, row, column+1)
 		} else if row < 8 {
-			generateBoard(board, randomIntArray(), row+1, 0)
+			generateBoard(board, shuffledRow(), row+1, 0)
 		}
 
 		// If the board was filled successfully, finish
@@ -54,7 +73,7 @@ func generateBoard(board *Board, sequence [9]int, row int, column int) *Board {
 
 // canPlay reports whether a number can be played (according to the Sudoku rules) in a specific
 // row and column position.
-func canPlay(board *Board, number int, row int, column int) bool {
+func canPlay(board *Board, number Cell, row int, column int) bool {
 	// Checks if the number was played in the same row or column
 	for index := range 9 {
 		if board[row][index] == number || board[index][column] == number {
@@ -62,7 +81,7 @@ func canPlay(board *Board, number int, row int, column int) bool {
 		}
 	}
 
-	// Search which 3x3 grid the number is in
+	// Search which 3x3 grid that the number is in
 	var rowRange, columnRange [3]int
 	for start := 0; start < 9; start += 3 {
 		end := start + 2
@@ -76,7 +95,7 @@ func canPlay(board *Board, number int, row int, column int) bool {
 		}
 	}
 
-	// Search 3x3 grid for number
+	// Search the 3x3 grid for the number
 	for _, thisRow := range rowRange {
 		for _, thisColumn := range columnRange {
 			if board[thisRow][thisColumn] == number {
@@ -88,10 +107,11 @@ func canPlay(board *Board, number int, row int, column int) bool {
 	return true
 }
 
-// NewBoardRemoveNumbers returns a new [Board] copy of the board passed with n numbers removed
-// from the board at random positions.
-func NewBoardRemoveNumbers(board Board, n int) *Board {
-	for i := 0; i < n; i++ {
+// NewBoardForDifficulty generates a random unsolved [Board] based on the difficulty desired.
+func NewBoardForDifficulty(diff difficulty) *Board {
+	var board = NewBoard()
+
+	for i := 0; i < int(diff); i++ {
 		var x, y int
 		// Gets a random cell position from the board until it finds a position that is not empty.
 		for x, y = rand.Intn(9), rand.Intn(9); board[x][y] == EMPTY; {
@@ -100,17 +120,19 @@ func NewBoardRemoveNumbers(board Board, n int) *Board {
 		board[x][y] = EMPTY
 	}
 
-	return &board
+	return board
 }
 
-// randomIntArray generates an array of 9 random integers from 1 to 9 (inclusive), and sorts it
-// randomly.
-func randomIntArray() [9]int {
-	var trySequence [9]int
-	for i := 1; i < 10; i++ {
-		trySequence[i-1] = i
+// shuffledRow generates a valid Sudoku [Row] with a random/shuffled order.
+func shuffledRow() *Row {
+	var row = new(Row)
+	for i := 0; i < 9; i++ {
+		row[i] = Cell(i + 1)
 	}
 
-	rand.Shuffle(9, func(i, j int) { trySequence[i], trySequence[j] = trySequence[j], trySequence[i] })
-	return trySequence
+	rand.Shuffle(9, func(i, j int) {
+		row[i], row[j] = row[j], row[i]
+	})
+
+	return row
 }
