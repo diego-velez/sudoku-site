@@ -79,6 +79,11 @@ func isValidCell(board *Board, number Cell, row int, column int) bool {
 		return false
 	}
 
+	// Only numbers within the range [1,length of the board] are considered valid
+	if int(number) > len(board) || int(number) < 1 {
+		return false
+	}
+
 	// Checks if the number was played in the same row or column
 	for index := range 9 {
 		if board[row][index] == number || board[index][column] == number {
