@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"src/pkg/sudoku"
 )
 
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {
@@ -12,9 +13,9 @@ func HandleIndex(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	var unsolvedBoard = NewBoardForDifficulty(MEDIUM)
+	var unsolvedBoard = sudoku.NewBoardForDifficulty(sudoku.MEDIUM)
 
-	templ, err := template.ParseFiles("assets/index.gohtml", "assets/com_sudoku_board.gohtml")
+	templ, err := template.ParseFiles("web/template/index.gohtml", "web/template/com_sudoku_board.gohtml")
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
@@ -29,14 +30,14 @@ func HandleIndex(writer http.ResponseWriter, request *http.Request) {
 func HandleBoard(writer http.ResponseWriter, request *http.Request) {
 	var difficulty = request.PathValue("difficulty")
 
-	var board *Board
+	var board *sudoku.Board
 	switch difficulty {
 	case "easy":
-		board = NewBoardForDifficulty(EASY)
+		board = sudoku.NewBoardForDifficulty(sudoku.EASY)
 	case "medium":
-		board = NewBoardForDifficulty(MEDIUM)
+		board = sudoku.NewBoardForDifficulty(sudoku.MEDIUM)
 	case "hard":
-		board = NewBoardForDifficulty(HARD)
+		board = sudoku.NewBoardForDifficulty(sudoku.HARD)
 	default:
 		http.Error(writer, "Invalid difficulty:"+difficulty, http.StatusBadRequest)
 		return
@@ -56,8 +57,8 @@ func HandleBoard(writer http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	var fs = http.FileServer(http.Dir("assets/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	var staticFilesystem = http.FileServer(http.Dir("web/static/"))
+	http.Handle("/static/", http.StripPrefix("/static/", staticFilesystem))
 
 	http.HandleFunc("/", HandleIndex)
 

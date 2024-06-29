@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o main ./src
+RUN go build -o main ./cmd
 
 ARG PORT
 EXPOSE $PORT
