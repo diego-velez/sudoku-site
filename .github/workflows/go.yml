@@ -21,7 +21,7 @@ jobs:
         go-version: '1.22.x'
 
     - name: Build
-      run: go build -v -o ./tmp/main ./cmd/...
+      run: go build -v -o ./tmp/main ./cmd/sudoku/main.go
 
     - name: Test
-      run: go test -v ./cmd/...
+      run: go test -v ./...
