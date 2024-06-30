@@ -4,8 +4,8 @@ import (
 	"github.com/a-h/templ"
 	"html/template"
 	"net/http"
-	"src/pkg/sudoku"
-	customTemplates "src/web/template"
+	"sudoku/pkg/sudoku"
+	customTemplates "sudoku/web/template"
 )
 
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {

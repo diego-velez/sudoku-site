@@ -9,7 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"src/pkg/sudoku"
+	"sudoku/pkg/sudoku"
 	"strconv"
 )
 

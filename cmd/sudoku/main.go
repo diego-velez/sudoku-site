@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
-	"src/api/handler"
+	"sudoku/api/handler"
 )
 
 func main() {

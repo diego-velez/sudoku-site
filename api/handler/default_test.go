@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"src/pkg/sudoku"
 	"strconv"
 	"strings"
+	"sudoku/pkg/sudoku"
 	"testing"
 )
 
