@@ -1,10 +1,12 @@
 package main
 
 import (
+	"github.com/a-h/templ"
 	"html/template"
 	"net/http"
 	"os"
 	"src/pkg/sudoku"
+	my "src/web/template"
 )
 
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {
@@ -14,16 +16,22 @@ func HandleIndex(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	var unsolvedBoard = sudoku.NewBoardForDifficulty(sudoku.MEDIUM)
+	var templComponent = my.SudokuBoardTemplate(*unsolvedBoard)
 
-	templ, err := template.ParseFiles("web/template/index.gohtml", "web/template/com_sudoku_board.gohtml")
+	var html, err = templ.ToGoHTML(request.Context(), templComponent)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := templ.ExecuteTemplate(writer, "index.gohtml", unsolvedBoard); err != nil {
+	myTempl, err := template.ParseFiles("web/template/index.gohtml")
+	if err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	if err := myTempl.Execute(writer, html); err != nil {
+		http.Error(writer, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -43,16 +51,9 @@ func HandleBoard(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	templ, err := template.ParseFiles("assets/com_sudoku_board.gohtml")
-	if err != nil {
+	var templComponent = my.SudokuBoardTemplate(*board)
+	if err := templComponent.Render(request.Context(), writer); err != nil {
 		http.Error(writer, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	err = templ.ExecuteTemplate(writer, "sudoku_board", board)
-	if err != nil {
-		http.Error(writer, err.Error(), http.StatusInternalServerError)
-		return
 	}
 }
 

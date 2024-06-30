@@ -12,7 +12,7 @@
 
 <div class="sudoku-container">
     <h1>El DV metiendole al Sudoku de a doble y con el matrix brrrr</h1>
-    {{template "sudoku_board" .}}
+    {{.}}
 
     <div>
         <button hx-get="/board/easy" hx-target="#sudoku-board" hx-swap="outerHTML">Easy</button>
