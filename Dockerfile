@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o main ./cmd
+RUN go build -v -o main ./cmd/sudoku/main.go
 
 ARG PORT
 EXPOSE $PORT
