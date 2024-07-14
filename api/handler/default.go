@@ -9,11 +9,6 @@ import (
 )
 
 func HandleIndex(writer http.ResponseWriter, request *http.Request) {
-	if request.Method != http.MethodGet {
-		http.Error(writer, "Method not allowed:"+request.Method, http.StatusMethodNotAllowed)
-		return
-	}
-
 	var unsolvedBoard = sudoku.NewBoardForDifficulty(sudoku.MEDIUM)
 	var templComponent = customTemplates.SudokuBoardTemplate(*unsolvedBoard)
 

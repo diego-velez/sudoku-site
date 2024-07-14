@@ -10,7 +10,7 @@ func main() {
 	var staticFilesystem = http.FileServer(http.Dir("web/static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", staticFilesystem))
 
-	http.HandleFunc("/", handler.HandleIndex)
+	http.HandleFunc("GET /{$}", handler.HandleIndex)
 
 	http.HandleFunc("/board/{difficulty}", handler.HandleBoard)
 
